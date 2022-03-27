@@ -1,0 +1,29 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: sudo apt install
+      run: sudo apt install build-essential cmake curl libmpfr-dev libmpc-dev libgmp-dev e2fsprogs ninja-build qemu-system-gui qemu-system-x86 qemu-utils ccache rsync unzip texinfo && sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt update && sudo apt install gcc-11 g++-11 
+    - name: Build ToolChain
+      run: Meta/serenity.sh rebuild-toolchain
+    - name: Build serenityOS
+      run: Meta/serenity.sh run
+    - name: ls files
+      run: ls
+    - name: Upload Executables
+      uses: actions/upload-artifact@v2
+      with:
+        name: serenity-build
+        path: |
+          Build/i686/Root
